@@ -1,0 +1,24 @@
+name: Daily Discord Post
+
+on:
+  schedule:
+    # 매일 일본시간 20:00 (UTC 11:00). GitHub 사정으로 5~15분 늦을 수 있음
+    - cron: "0 11 * * *"
+  workflow_dispatch: {}  # Actions 탭에서 수동 실행(테스트)용
+
+permissions:
+  contents: read
+  actions: write  # 60일 비활동 시 자동 중지 방지(keepalive)용
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python post.py
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - uses: gautamkrishnar/keepalive-workflow@v2
